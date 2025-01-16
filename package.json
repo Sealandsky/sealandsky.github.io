@@ -6,8 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:netlify": "npm run build",
-    "deploy:gh-pages": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build"
   },
   "dependencies": {
     "hanzi-writer": "3.5.0",
@@ -15,7 +14,6 @@
     "vue": "^3.3.4"
   },
   "devDependencies": {
-    "@esbuild/darwin-arm64": "^0.18.20",
     "@vitejs/plugin-vue": "^4.2.3",
     "esbuild": "^0.18.20",
     "gh-pages": "^5.0.0",
