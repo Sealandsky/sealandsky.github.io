@@ -1,5 +1,9 @@
 <template>
   <div class="stroke-order">
+    <div class="header">
+      <h2>汉字笔顺</h2>
+      <p class="subtitle">输入汉字，即刻查看笔顺动画</p>
+    </div>
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
       <div>加载中...</div>
@@ -14,55 +18,38 @@
         maxlength="1" 
         placeholder="请输入汉字"
         class="character-input"
+        :class="{ 'has-value': character }"
       >
+      <div class="input-hint">{{ character ? '按下播放按钮开始动画' : '请输入一个汉字' }}</div>
     </div>
     
     <div class="display-section">
-      <div class="stroke-info" v-if="currentStrokeName">
-        当前笔画：{{ currentStrokeName }}
-      </div>
-      
       <div class="writers-container">
         <svg ref="hanziWriterTarget" class="character-display" :width="300" :height="300">
-          <!-- 添加网格背景 -->
           <defs>
-            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#DDD" stroke-width="1"/>
+            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#f0f0f0" stroke-width="1"/>
             </pattern>
           </defs>
-          <!-- 背景矩形 -->
           <rect width="100%" height="100%" fill="url(#grid)"/>
-          <!-- 对角线 -->
-          <line x1="0" y1="0" x2="300" y2="300" stroke="#DDD" />
-          <line x1="300" y1="0" x2="0" y2="300" stroke="#DDD" />
-          <!-- 中心线 -->
-          <line x1="150" y1="0" x2="150" y2="300" stroke="#DDD" />
-          <line x1="0" y1="150" x2="300" y2="150" stroke="#DDD" />
+          <line x1="0" y1="150" x2="300" y2="150" stroke="#f0f0f0" />
+          <line x1="150" y1="0" x2="150" y2="300" stroke="#f0f0f0" />
         </svg>
       </div>
       
       <div class="stroke-progress">
-        <div class="stroke-steps" ref="strokeStepsTarget">
-          <!-- 笔画进展将在这里动态渲染 -->
-        </div>
+        <div class="stroke-steps" ref="strokeStepsTarget"></div>
       </div>
       
       <div class="controls">
-        <button @click="animate" :disabled="isAnimating">播放动画</button>
-        <div class="speed-control">
-          <label>速度：</label>
-          <select v-model="speed" @change="updateSpeed">
-            <option value="0.5">慢速</option>
-            <option value="1">中速</option>
-            <option value="2">快速</option>
-          </select>
-        </div>
-        <div class="grid-control">
-          <label>
-            <input type="checkbox" v-model="showGrid" @change="toggleGrid">
-            显示网格
-          </label>
-        </div>
+        <button 
+          @click="animate" 
+          :disabled="isAnimating || !character"
+          class="play-button"
+        >
+          <span class="button-icon">▶</span>
+          {{ isAnimating ? '播放中...' : '播放动画' }}
+        </button>
       </div>
     </div>
   </div>
@@ -107,15 +94,15 @@ const renderFanningStrokes = (strokes) => {
     const strokesPortion = strokes.slice(0, i + 1)
     
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.style.width = '75px'
-    svg.style.height = '75px'
+    svg.style.width = '60px'
+    svg.style.height = '60px'
     svg.style.border = '1px solid #EEE'
     svg.style.marginRight = '3px'
-    
+    svg.style.borderRadius = '6px'
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     
     // 使用 HanziWriter 的缩放转换
-    const transformData = HanziWriter.getScalingTransform(75, 75)
+    const transformData = HanziWriter.getScalingTransform(60, 60)
     group.setAttributeNS(null, 'transform', transformData.transform)
     svg.appendChild(group)
     
@@ -199,7 +186,7 @@ const initWriter = (char) => {
       delayBetweenStrokes: 1000,
       strokeColor: '#000',
       outlineColor: '#ddd',
-      radicalColor: '#337ab7',
+      radicalColor: '#4CAF50',
       charColor: 'transparent',
       showCharacter: true,
       showOutline: false,
@@ -271,174 +258,121 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+}
+
+.header h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1rem;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .character-input {
-  font-size: 24px;
-  padding: 8px;
-  width: 60px;
+  font-size: 32px;
+  padding: 12px;
+  width: 80px;
+  height: 80px;
   text-align: center;
-  border: 2px solid #ddd;
-  border-radius: 4px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.writers-container {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  width: 100%;
+.character-input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 2px 12px rgba(76,175,80,0.2);
+  outline: none;
+}
+
+.input-hint {
+  color: #666;
+  font-size: 0.9rem;
 }
 
 .character-display {
-  width: 300px;
-  height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #eee;
+  border-radius: 12px;
   background: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
 }
-
-.loading-message {
-  color: #666;
+.stroke-step-label {
   font-size: 14px;
+  color: #999;
 }
-
-svg {
-  max-width: 100%;
-  max-height: 100%;
-  position: absolute;
-}
-
-.controls {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.stroke-info {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #666;
-  min-height: 24px;
-}
-
-button {
-  padding: 8px 16px;
-  cursor: pointer;
-  background-color: #4CAF50;
+.play-button {
+  margin: 0 auto;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  background: #4CAF50;
   color: white;
   border: none;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-button:hover:not(:disabled) {
-  background-color: #45a049;
-}
-
-.speed-control {
+  border-radius: 8px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  justify-content: center;
 }
 
-select {
-  padding: 4px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+.play-button:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76,175,80,0.2);
 }
 
-.stroke-progress {
-  margin-top: 20px;
-  width: 100%;
-  overflow-x: auto;
+.play-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.button-icon {
+  font-size: 0.9em;
 }
 
 .stroke-steps {
   display: flex;
-  padding: 10px;
-  min-height: 77px;
-  align-items: center;
+  padding: 15px;
+  gap: 15px;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  /* background: #f9f9f9; */
+  border-radius: 12px;
 }
 
-.stroke-steps svg {
-  background: white;
-  border-radius: 4px;
-  transition: transform 0.2s;
-}
-
-.stroke-steps svg:hover {
-  transform: scale(1.1);
-  cursor: pointer;
-}
-
-.grid-control {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.grid-control label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-}
-
-.grid-control input[type="checkbox"] {
-  cursor: pointer;
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 10px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.error-message {
-  color: #ff4444;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ffdddd;
-  border-radius: 4px;
-  background-color: #ffeeee;
+@media (max-width: 600px) {
+  .stroke-order {
+    padding: 15px;
+  }
+  
+  .character-input {
+    font-size: 28px;
+    width: 70px;
+    height: 70px;
+  }
 }
 </style> 

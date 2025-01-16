@@ -1,6 +1,5 @@
 <template>
   <div class="app">
-    <h1>汉字笔顺演示</h1>
     <StrokeOrder />
   </div>
 </template>

@@ -14,8 +14,11 @@
     "vue": "^3.3.4"
   },
   "devDependencies": {
+    "@esbuild/darwin-arm64": "^0.18.20",
     "@vitejs/plugin-vue": "^4.2.3",
+    "esbuild": "^0.18.20",
     "gh-pages": "^5.0.0",
-    "vite": "^4.3.9"
+    "terser": "^5.37.0",
+    "vite": "4.2.0"
   }
 }
