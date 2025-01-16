@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    // ... existing dependencies ...
+  },
+  "devDependencies": {
+    // ... existing devDependencies ...
+  }
+} 

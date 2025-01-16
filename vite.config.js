@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
 export default defineConfig({
-  base: './',
+  base: '/hanzi-stroke-order/',
   plugins: [vue()],
   optimizeDeps: {
     include: ['hanzi-writer', 'hanzi-writer-data/*']
